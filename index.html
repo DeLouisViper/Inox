@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tính Giá Inox</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.8.0/dist/tabler-icons.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f5f7f5;
+      --surface: #ffffff;
+      --surface2: #f0f4f1;
+      --border: #d4ddd6;
+      --border2: #b8cbbc;
+      --text: #1a2e1e;
+      --text2: #4d6653;
+      --text3: #7a9982;
+      --green: #1D9E75;
+      --green-dark: #0F6E56;
+      --green-light: #e1f5ee;
+      --green-mid: #9FE1CB;
+      --radius: 10px;
+      --radius-lg: 16px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 1.5rem 1rem 3rem;
+    }
+
+    .container { max-width: 600px; margin: 0 auto; }
+
+    /* Header */
+    .header { text-align: center; margin-bottom: 2rem; }
+    .header-icon {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: var(--green); display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1rem; box-shadow: 0 4px 16px rgba(29,158,117,0.25);
+    }
+    .header-icon i { font-size: 30px; color: #fff; }
+    .header h1 { font-size: 26px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; }
+    .header p { font-size: 14px; color: var(--text2); margin-top: 6px; }
+
+    /* Tabs */
+    .tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 1.25rem; }
+    .tab-btn {
+      padding: 10px 6px; border-radius: var(--radius); border: 1.5px solid var(--border);
+      background: var(--surface); font-size: 13px; font-weight: 500; color: var(--text2);
+      cursor: pointer; transition: all 0.15s; display: flex; flex-direction: column;
+      align-items: center; gap: 4px; line-height: 1.2; text-align: center;
+    }
+    .tab-btn i { font-size: 20px; }
+    .tab-btn:hover { border-color: var(--green); color: var(--green); background: var(--green-light); }
+    .tab-btn.active {
+      background: var(--green); color: #fff; border-color: var(--green);
+      box-shadow: 0 3px 10px rgba(29,158,117,0.3);
+    }
+
+    /* Card */
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 1.5rem;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    .card-header { margin-bottom: 1rem; }
+    .card-title { font-size: 17px; font-weight: 600; color: var(--text); }
+    .formula-tag {
+      display: inline-block; margin-top: 8px; padding: 6px 12px;
+      background: var(--green-light); border-radius: 6px;
+      font-size: 12px; font-family: 'Courier New', monospace;
+      color: var(--green-dark); border: 1px solid var(--green-mid);
+    }
+
+    /* Fields */
+    .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1.25rem; }
+    .field label {
+      display: block; font-size: 12px; font-weight: 600; color: var(--text2);
+      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;
+    }
+    .field input {
+      width: 100%; padding: 10px 12px; border: 1.5px solid var(--border);
+      border-radius: var(--radius); font-size: 15px; color: var(--text);
+      background: var(--surface); outline: none; transition: border-color 0.15s;
+      -moz-appearance: textfield;
+    }
+    .field input::-webkit-outer-spin-button,
+    .field input::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .field input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(29,158,117,0.12); }
+    .field input::placeholder { color: var(--text3); font-size: 13px; }
+    .field.full { grid-column: 1 / -1; }
+
+    /* Button */
+    .calc-btn {
+      width: 100%; padding: 13px; background: var(--green); color: #fff;
+      border: none; border-radius: var(--radius); font-size: 16px; font-weight: 600;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      gap: 8px; transition: all 0.15s; letter-spacing: 0.2px;
+    }
+    .calc-btn:hover { background: var(--green-dark); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(29,158,117,0.35); }
+    .calc-btn:active { transform: translateY(0); }
+    .calc-btn i { font-size: 18px; }
+
+    /* Error */
+    .error-msg {
+      display: none; margin-top: 12px; padding: 10px 14px;
+      background: #fef3f1; border: 1px solid #f5c1b2; border-radius: var(--radius);
+      font-size: 13px; color: #c0381a; align-items: center; gap: 6px;
+    }
+    .error-msg.show { display: flex; }
+
+    /* Result */
+    .result-box {
+      display: none; margin-top: 1.25rem;
+      background: linear-gradient(135deg, #0F6E56 0%, #1D9E75 100%);
+      border-radius: var(--radius); padding: 1.25rem 1.5rem; color: #fff;
+    }
+    .result-box.show { display: block; }
+    .result-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-bottom: 6px; }
+    .result-amount { font-size: 32px; font-weight: 700; letter-spacing: -0.5px; }
+    .result-divider { border: none; border-top: 1px solid rgba(255,255,255,0.2); margin: 10px 0; }
+    .result-kg { font-size: 13px; opacity: 0.85; display: flex; align-items: center; gap: 6px; }
+
+    /* Reset */
+    .reset-btn {
+      width: 100%; margin-top: 10px; padding: 9px; background: transparent;
+      color: var(--text3); border: 1.5px solid var(--border); border-radius: var(--radius);
+      font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      gap: 6px; transition: all 0.15s;
+    }
+    .reset-btn:hover { color: var(--text2); border-color: var(--border2); }
+
+    /* Footer */
+    .footer { text-align: center; margin-top: 2rem; font-size: 12px; color: var(--text3); }
+
+    @media (max-width: 420px) {
+      .fields { grid-template-columns: 1fr; }
+      .tabs { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="header-icon"><i class="ti ti-calculator"></i></div>
+    <h1>Tính Giá Inox</h1>
+    <p>Chọn loại vật liệu và nhập thông số để tính giá thành tiền</p>
+  </div>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-type="tam304" role="tab" aria-selected="true">
+      <i class="ti ti-layout-board"></i>Tấm/La 304
+    </button>
+    <button class="tab-btn" data-type="tam316" role="tab">
+      <i class="ti ti-layout-board"></i>Tấm/La 316
+    </button>
+    <button class="tab-btn" data-type="hop" role="tab">
+      <i class="ti ti-square"></i>Hộp
+    </button>
+    <button class="tab-btn" data-type="thanhv" role="tab">
+      <i class="ti ti-angle"></i>Thanh V
+    </button>
+    <button class="tab-btn" data-type="ong" role="tab">
+      <i class="ti ti-circle"></i>Ống
+    </button>
+    <button class="tab-btn" data-type="lap" role="tab">
+      <i class="ti ti-cylinder"></i>Cây láp
+    </button>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title" id="calcTitle">Tấm / Thanh la loại 304</div>
+      <div class="formula-tag" id="calcFormula">Dày × Dài × Rộng × 7.93 × Giá</div>
+    </div>
+
+    <div class="fields" id="fieldsContainer"></div>
+
+    <button class="calc-btn" onclick="calculate()">
+      <i class="ti ti-math-function"></i> Tính giá
+    </button>
+
+    <div class="error-msg" id="errorMsg">
+      <i class="ti ti-alert-circle" style="font-size:16px;flex-shrink:0"></i>
+      Vui lòng nhập đầy đủ và đúng tất cả các thông số.
+    </div>
+
+    <div class="result-box" id="resultBox">
+      <div class="result-label">Thành tiền</div>
+      <div class="result-amount" id="resultValue">0 đ</div>
+      <hr class="result-divider">
+      <div class="result-kg">
+        <i class="ti ti-weight" style="font-size:15px"></i>
+        <span id="resultKg">Khối lượng: 0 kg</span>
+      </div>
+    </div>
+
+    <button class="reset-btn" onclick="resetForm()">
+      <i class="ti ti-refresh" style="font-size:14px"></i> Nhập lại
+    </button>
+  </div>
+
+  <div class="footer">Ứng dụng tính giá Inox &nbsp;•&nbsp; Phiên bản 1.0</div>
+</div>
+
+<script>
+const types = {
+  tam304: {
+    title: 'Tấm / Thanh la loại 304',
+    formula: 'Dày (mm) × Dài (mm) × Rộng (mm) × 7.93 × Giá',
+    fields: [
+      { id: 'day', label: 'Chiều dày (mm)', placeholder: 'VD: 2' },
+      { id: 'dai', label: 'Chiều dài (mm)', placeholder: 'VD: 1000' },
+      { id: 'rong', label: 'Chiều rộng (mm)', placeholder: 'VD: 500', cls: '' },
+      { id: 'gia', label: 'Giá (VNĐ/kg)', placeholder: 'VD: 80000' },
+    ],
+    calc: (v) => {
+      const kg = (v.day/1000) * (v.dai/1000) * (v.rong/1000) * 7930;
+      return { tong: kg * v.gia, kg };
+    }
+  },
+  tam316: {
+    title: 'Tấm / Thanh la loại 316',
+    formula: 'Dày (mm) × Dài (mm) × Rộng (mm) × 7.98 × Giá',
+    fields: [
+      { id: 'day', label: 'Chiều dày (mm)', placeholder: 'VD: 2' },
+      { id: 'dai', label: 'Chiều dài (mm)', placeholder: 'VD: 1000' },
+      { id: 'rong', label: 'Chiều rộng (mm)', placeholder: 'VD: 500' },
+      { id: 'gia', label: 'Giá (VNĐ/kg)', placeholder: 'VD: 90000' },
+    ],
+    calc: (v) => {
+      const kg = (v.day/1000) * (v.dai/1000) * (v.rong/1000) * 7980;
+      return { tong: kg * v.gia, kg };
+    }
+  },
+  hop: {
+    title: 'Hộp vuông / chữ nhật',
+    formula: '((C1 + C2 - 2×Dày) × Dày - 0.11) × 0.01586 × Dài × Giá',
+    fields: [
+      { id: 'canh1', label: 'Cạnh 1 (mm)', placeholder: 'VD: 25' },
+      { id: 'canh2', label: 'Cạnh 2 (mm)', placeholder: 'VD: 25' },
+      { id: 'day', label: 'Chiều dày (mm)', placeholder: 'VD: 0.8' },
+      { id: 'dai', label: 'Chiều dài (m)', placeholder: 'VD: 6' },
+      { id: 'gia', label: 'Giá (VNĐ/kg)', placeholder: 'VD: 74000', cls: 'full' },
+    ],
+    calc: (v) => {
+      const kg = ((v.canh1 + v.canh2 - 2 * v.day) * v.day - 0.11) * 0.01586 * v.dai;
+      return { tong: kg * v.gia, kg };
+    }
+  },
+  thanhv: {
+    title: 'Thanh V (góc L)',
+    formula: '(Cạnh 1 + Cạnh 2) × Dày × Dài × 7.93 × Giá',
+    fields: [
+      { id: 'canh1', label: 'Cạnh 1 (mm)', placeholder: 'VD: 40' },
+      { id: 'canh2', label: 'Cạnh 2 (mm)', placeholder: 'VD: 40' },
+      { id: 'day', label: 'Chiều dày (mm)', placeholder: 'VD: 4' },
+      { id: 'dai', label: 'Chiều dài (m)', placeholder: 'VD: 6' },
+      { id: 'gia', label: 'Giá (VNĐ/kg)', placeholder: 'VD: 75000', cls: 'full' },
+    ],
+    calc: (v) => {
+      const kg = ((v.canh1 + v.canh2) / 1000) * (v.day / 1000) * v.dai * 7930;
+      return { tong: kg * v.gia, kg };
+    }
+  },
+  ong: {
+    title: 'Ống Inox',
+    formula: '(Đường kính - Dày) × Dày × 0.02491 × Dài × Giá',
+    fields: [
+      { id: 'duongkinh', label: 'Đường kính (mm)', placeholder: 'VD: 50' },
+      { id: 'day', label: 'Chiều dày (mm)', placeholder: 'VD: 2' },
+      { id: 'dai', label: 'Chiều dài (m)', placeholder: 'VD: 6' },
+      { id: 'gia', label: 'Giá (VNĐ/kg)', placeholder: 'VD: 85000' },
+    ],
+    calc: (v) => {
+      const kg = (v.duongkinh - v.day) * v.day * 0.02491 * v.dai;
+      return { tong: kg * v.gia, kg };
+    }
+  },
+  lap: {
+    title: 'Cây láp (thanh đặc)',
+    formula: '(Đường kính / 2)² × 0.02491 × Dài × Giá',
+    fields: [
+      { id: 'duongkinh', label: 'Đường kính (mm)', placeholder: 'VD: 30' },
+      { id: 'dai', label: 'Chiều dài (m)', placeholder: 'VD: 3' },
+      { id: 'gia', label: 'Giá (VNĐ/kg)', placeholder: 'VD: 120000', cls: 'full' },
+    ],
+    calc: (v) => {
+      const r = v.duongkinh / 2;
+      const kg = r * r * 0.02491 * v.dai;
+      return { tong: kg * v.gia, kg };
+    }
+  }
+};
+
+let currentType = 'tam304';
+
+function renderFields(type) {
+  const cfg = types[type];
+  document.getElementById('calcTitle').textContent = cfg.title;
+  document.getElementById('calcFormula').textContent = cfg.formula;
+  const c = document.getElementById('fieldsContainer');
+  c.innerHTML = cfg.fields.map(f =>
+    `<div class="field ${f.cls || ''}">
+      <label for="${f.id}">${f.label}</label>
+      <input type="number" id="${f.id}" placeholder="${f.placeholder}" min="0" step="any" oninput="clearResult()">
+    </div>`
+  ).join('');
+  clearResult();
+}
+
+function clearResult() {
+  document.getElementById('resultBox').classList.remove('show');
+  document.getElementById('errorMsg').classList.remove('show');
+}
+
+function calculate() {
+  const cfg = types[currentType];
+  const vals = {};
+  let valid = true;
+  for (const f of cfg.fields) {
+    const el = document.getElementById(f.id);
+    const v = parseFloat(el.value);
+    if (!el.value || isNaN(v) || v <= 0) { valid = false; break; }
+    vals[f.id] = v;
+  }
+  if (!valid) {
+    document.getElementById('errorMsg').classList.add('show');
+    document.getElementById('resultBox').classList.remove('show');
+    return;
+  }
+  document.getElementById('errorMsg').classList.remove('show');
+  const { tong, kg } = cfg.calc(vals);
+  document.getElementById('resultValue').textContent = Math.round(tong).toLocaleString('vi-VN') + ' đ';
+  document.getElementById('resultKg').textContent = 'Khối lượng: ' + kg.toFixed(3) + ' kg';
+  document.getElementById('resultBox').classList.add('show');
+}
+
+function resetForm() {
+  renderFields(currentType);
+}
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => {
+      b.classList.remove('active');
+      b.setAttribute('aria-selected', 'false');
+    });
+    btn.classList.add('active');
+    btn.setAttribute('aria-selected', 'true');
+    currentType = btn.dataset.type;
+    renderFields(currentType);
+  });
+});
+
+renderFields(currentType);
+</script>
+</body>
+</html>
